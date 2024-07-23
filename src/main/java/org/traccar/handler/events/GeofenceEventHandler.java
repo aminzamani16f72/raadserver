@@ -17,14 +17,13 @@ package org.traccar.handler.events;
 
 import io.netty.channel.ChannelHandler;
 import org.traccar.helper.model.PositionUtil;
-import org.traccar.model.Calendar;
-import org.traccar.model.Event;
-import org.traccar.model.Geofence;
-import org.traccar.model.Position;
+import org.traccar.model.*;
 import org.traccar.session.cache.CacheManager;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
+import org.traccar.storage.Storage;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,10 +38,13 @@ public class GeofenceEventHandler extends BaseEventHandler {
     @Inject
     public GeofenceEventHandler(CacheManager cacheManager) {
         this.cacheManager = cacheManager;
+
     }
 
     @Override
     protected Map<Event, Position> analyzePosition(Position position) {
+        long deviceId = position.getDeviceId();
+        Device device = cacheManager.getObject(Device.class, deviceId);
         if (!PositionUtil.isLatest(cacheManager, position)) {
             return null;
         }
@@ -67,9 +69,12 @@ public class GeofenceEventHandler extends BaseEventHandler {
                 long calendarId = geofence.getCalendarId();
                 Calendar calendar = calendarId != 0 ? cacheManager.getObject(Calendar.class, calendarId) : null;
                 if (calendar == null || calendar.checkMoment(position.getFixTime())) {
-                    Event event = new Event(Event.TYPE_GEOFENCE_EXIT, position);
-                    event.setGeofenceId(geofenceId);
-                    events.put(event, position);
+                    Event eventExit = new Event(Event.TYPE_GEOFENCE_EXIT, position);
+                    Map<String,Object> attribute=new HashMap<>();
+                    attribute.put("messageFa","دستگاه  "+ device.getName()+" از حصار جغرافیایی "+" "+geofence.getName()+" "+ "خارج شد ");
+                    eventExit.setAttributes(attribute);
+                    eventExit.setGeofenceId(geofenceId);
+                    events.put(eventExit, position);
                 }
             }
         }
@@ -77,9 +82,13 @@ public class GeofenceEventHandler extends BaseEventHandler {
             long calendarId = cacheManager.getObject(Geofence.class, geofenceId).getCalendarId();
             Calendar calendar = calendarId != 0 ? cacheManager.getObject(Calendar.class, calendarId) : null;
             if (calendar == null || calendar.checkMoment(position.getFixTime())) {
-                Event event = new Event(Event.TYPE_GEOFENCE_ENTER, position);
-                event.setGeofenceId(geofenceId);
-                events.put(event, position);
+                Event eventEnter = new Event(Event.TYPE_GEOFENCE_ENTER, position);
+                Geofence geofence=cacheManager.getObject(Geofence.class,geofenceId);
+                Map<String,Object> attribute=new HashMap<>();
+                attribute.put("messageFa","  دستگاه " +device.getName()+ " وارد حصار جغرافیایی"+" "+geofence.getName()+" "+ "شد ");
+                eventEnter.setAttributes(attribute);
+                eventEnter.setGeofenceId(geofenceId);
+                events.put(eventEnter, position);
             }
         }
         return events;

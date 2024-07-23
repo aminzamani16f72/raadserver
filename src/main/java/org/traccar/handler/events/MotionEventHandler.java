@@ -23,9 +23,8 @@ import org.traccar.config.Keys;
 import org.traccar.helper.UnitsConverter;
 import org.traccar.helper.model.AttributeUtil;
 import org.traccar.helper.model.PositionUtil;
-import org.traccar.model.Device;
-import org.traccar.model.Event;
-import org.traccar.model.Position;
+import org.traccar.model.*;
+import org.traccar.model.Calendar;
 import org.traccar.reports.common.TripsConfig;
 import org.traccar.session.cache.CacheManager;
 import org.traccar.session.state.MotionProcessor;
@@ -38,10 +37,8 @@ import org.traccar.storage.query.Request;
 
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+
+import java.util.*;
 
 @Singleton
 @ChannelHandler.Sharable
@@ -64,33 +61,42 @@ public class MotionEventHandler extends BaseEventHandler {
         long deviceId = position.getDeviceId();
         Device device = cacheManager.getObject(Device.class, deviceId);
         Object result = device.getAttributes().get("speedLimit");
+        Optional<Integer> speedLimitOptional = Optional.ofNullable((Integer) result);
+        int speedLimit = speedLimitOptional.orElse(200);
+
         if (device == null || !PositionUtil.isLatest(cacheManager, position)) {
             return null;
         }
-        var speedLimit= UnitsConverter.kphFromKnots(position.getSpeed()) ;
-        var intSpeed=(int)(Math.ceil(speedLimit));
+        var speed= UnitsConverter.kphFromKnots(position.getSpeed()) ;
+        var intSpeed=(int)(Math.ceil(speed));
            try {
                if((Long)position.getAttributes().get("io113")<15){
                    Map<String,Object> attribute=new HashMap<>();
                    attribute.put("alarm","lowBattery");
-                   attribute.put("messageFa","باطری ضعیف است ");
+                   attribute.put("messageFa","باطری دستگاه"+" "+device.getName()+" " +" ضعیف است");
 
                    Event eventLowBattery=new Event(Event.TYPE_ALARM,deviceId);
+                   eventLowBattery.setPositionId(position.getId());
                    eventLowBattery.setAttributes(attribute);
                    events.put(eventLowBattery, position);
                    }
-               if (speedLimit > ((Integer) result)) {
+               if (speed > (speedLimit)) {
                    Event eventSpeed=new Event(Event.TYPE_DEVICE_OVERSPEED, deviceId);
+                   eventSpeed.setPositionId(position.getId());
                    Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("messageFa","سرعت از حد مجاز بالاتر است ");
+                   String message="سرعت دستگاه "+" "+device.getName()+" " + " از حد مجاز فراتر رفت";
+                   String formattedSpeed = String.format("%.2f", speed);
+                   attribute.put("messageFa",message);
                    eventSpeed.setAttributes(attribute);
                    events.put(eventSpeed, position);
                }
+
                return events;
 
            } catch (ClassCastException | NullPointerException e) {
                // Handle exceptions appropriately
                // Log error or send error response via WebSocket
+               System.out.println("catch");
            }
 
 

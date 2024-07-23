@@ -98,7 +98,6 @@ public class GeolocationHandler extends ChannelInboundHandlerAdapter {
         position.set(Position.KEY_APPROXIMATE, true);
         position.setValid(true);
         position.setFixTime(position.getDeviceTime());
-        position.setPersianFixTime("12");
         position.setLatitude(latitude);
         position.setLongitude(longitude);
         position.setAccuracy(accuracy);

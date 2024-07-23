@@ -138,7 +138,7 @@ public class ReportResource extends SimpleObjectResource<Report> {
             @QueryParam("to") String to,
             @QueryParam("mail") boolean mail) throws StorageException, DateException {
         var fromDate= JalaliDateHelper.extractDateFromJalaliDateTime(from.substring(0,8),from.substring(8,14));
-        var toDate=JalaliDateHelper.extractDateFromJalaliDateTime(to.substring(0,8),to.substring(8,14));;
+        var toDate=JalaliDateHelper.extractDateFromJalaliDateTime(to.substring(0,8),to.substring(8,14));
         permissionsService.checkRestriction(getUserId(), UserRestrictions::getDisableReports);
         return executeReport(getUserId(), mail, stream -> {
             LogAction.logReport(getUserId(), "route", fromDate, toDate, deviceIds, groupIds);

@@ -34,7 +34,6 @@ public final class MotionProcessor {
             if (state.getMotionTime() != null) {
                 long oldTime = state.getMotionTime().getTime();
                 long newTime = position.getFixTime().getTime();
-
                 double distance = position.getDouble(Position.KEY_TOTAL_DISTANCE) - state.getMotionDistance();
                 Boolean ignition = null;
                 if (tripsConfig.getUseIgnition() && position.hasAttribute(Position.KEY_IGNITION)) {

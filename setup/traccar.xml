@@ -19,6 +19,9 @@
     For list of available parameters see following page: https://www.traccar.org/configuration-file/
 
     -->
+    <entry key='report.trip.minimalParkingDuration'>5</entry>
+    <entry key='report.trip.useIgnition'>true</entry>
+
     <entry key='geocoder.enable'>true</entry>
     <entry key='geocoder.type'>nominatim</entry>
     <entry key='geocoder.url'>https://nominatim.openstreetmap.org/reverse</entry>

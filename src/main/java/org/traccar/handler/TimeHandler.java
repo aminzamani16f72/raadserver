@@ -66,17 +66,16 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
                 || protocols.contains(ctx.pipeline().get(BaseProtocolDecoder.class).getProtocolName()))) {
 
             Position position = (Position) msg;
-            if (useServerTime) {
-                position.setDeviceTime(position.getServerTime());
-                position.setFixTime(position.getServerTime());
+            {
+                position.setFixTime(position.getDeviceTime());
 
 
-                var jalalidate=JalaliDateHelper.convertToJalaliDateFormat(position.getServerTime());
+                var jalalidate=JalaliDateHelper.convertToJalaliDateFormat(position.getDeviceTime());
                 var year=jalalidate.substring(0,2);
                 var month=jalalidate.substring(2,4);
                 var day=jalalidate.substring(4,6);
 
-                var jalaliTime=JalaliDateHelper.convertToTimeFormat(position.getServerTime());
+                var jalaliTime=JalaliDateHelper.convertToTimeFormat(position.getDeviceTime());
                 var hours=jalaliTime.substring(0,2);
                 var minutes=jalaliTime.substring(2,4);
                 var seconds=jalaliTime.substring(4,6);
@@ -84,9 +83,6 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
 
                 var persianDate= year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
                 position.setPersianFixTime((persianDate));
-            } else {
-                position.setFixTime(position.getDeviceTime());
-
             }
 
         }
