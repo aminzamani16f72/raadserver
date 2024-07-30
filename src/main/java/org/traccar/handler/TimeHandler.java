@@ -81,7 +81,8 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
                 var seconds=jalaliTime.substring(4,6);
 
 
-                var persianDate= year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds;
+                var persianDate="'" +year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds+"'";
+
                 position.setPersianFixTime((persianDate));
             }
 

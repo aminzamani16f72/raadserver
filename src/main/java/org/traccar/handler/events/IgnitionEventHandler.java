@@ -17,6 +17,7 @@
 package org.traccar.handler.events;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 import io.netty.channel.ChannelHandler;
@@ -49,6 +50,7 @@ public class IgnitionEventHandler extends BaseEventHandler {
 
         Map<Event, Position> result = null;
 
+
         if (position.hasAttribute(Position.KEY_IGNITION)) {
             boolean ignition = position.getBoolean(Position.KEY_IGNITION);
 
@@ -57,11 +59,19 @@ public class IgnitionEventHandler extends BaseEventHandler {
                 boolean oldIgnition = lastPosition.getBoolean(Position.KEY_IGNITION);
 
                 if (ignition && !oldIgnition) {
+                    Event ignitionOn=new Event(Event.TYPE_IGNITION_ON, position);
+                    Map<String,Object> attribute=new HashMap<>();
+                    attribute.put("messageFa","سوئیچ دستگاه"+" "+ device.getName() +" "+"روشن شد");
+                    ignitionOn.setAttributes(attribute);
                     result = Collections.singletonMap(
-                            new Event(Event.TYPE_IGNITION_ON, position), position);
+                            ignitionOn, position);
                 } else if (!ignition && oldIgnition) {
+                    Event ignitionOFF=new Event(Event.TYPE_IGNITION_OFF, position);
+                    Map<String,Object> attribute=new HashMap<>();
+                    attribute.put("messageFa","سوئیچ دستگاه"+" "+ device.getName() +" "+"خاموش شد");
+                    ignitionOFF.setAttributes(attribute);
                     result = Collections.singletonMap(
-                            new Event(Event.TYPE_IGNITION_OFF, position), position);
+                            ignitionOFF, position);
                 }
             }
         }

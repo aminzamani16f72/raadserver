@@ -36,3 +36,4 @@ public abstract class BaseDataHandler extends ChannelInboundHandlerAdapter {
     protected abstract Position handlePosition(Position position);
 
 }
+
