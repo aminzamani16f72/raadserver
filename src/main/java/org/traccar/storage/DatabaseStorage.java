@@ -110,6 +110,24 @@ public class DatabaseStorage extends Storage {
             throw new StorageException(e);
         }
     }
+    public <T> long addObjects(T entity, Request request) throws StorageException {
+        List<String> columns = request.getColumns().getColumns(entity.getClass(), "get");
+        StringBuilder query = new StringBuilder("INSERT INTO ");
+        query.append(getStorageName(entity.getClass()));
+        query.append("(");
+        query.append(formatColumns(columns, c -> c));
+        query.append(") VALUES (");
+        query.append(formatColumns(columns, c -> ':' + c));
+        query.append(")");
+        try {
+            QueryBuilder builder = QueryBuilder.create(config, dataSource, objectMapper, query.toString(), true);
+            builder.setObject(entity, columns);
+            return builder.executeUpdate();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
 
     @Override
     public <T> void updateObject(T entity, Request request) throws StorageException {

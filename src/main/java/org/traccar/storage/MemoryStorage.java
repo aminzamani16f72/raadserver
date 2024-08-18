@@ -143,6 +143,11 @@ public class MemoryStorage extends Storage {
     }
 
     @Override
+    public <T> long addObjects(T entity, Request request) throws StorageException {
+        return 0;
+    }
+
+    @Override
     public <T> void updateObject(T entity, Request request) {
         Set<String> columns = new HashSet<>(request.getColumns().getColumns(entity.getClass(), "get"));
         Collection<Object> items;

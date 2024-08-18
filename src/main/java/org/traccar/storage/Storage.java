@@ -27,6 +27,7 @@ public abstract class Storage {
     public abstract <T> List<T> getObjects(Class<T> clazz, Request request) throws StorageException;
     public abstract <T> List<T> getobjectByQueryAndCondition(Class<T> clazz, String query, Condition condition) throws StorageException;
     public abstract <T> long addObject(T entity, Request request) throws StorageException;
+    public abstract <T> long addObjects(T entity, Request request) throws StorageException;
 
     public abstract <T> void updateObject(T entity, Request request) throws StorageException;
 

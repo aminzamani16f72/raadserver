@@ -16,6 +16,8 @@
 package org.traccar.api.resource;
 
 import jakarta.ws.rs.FormParam;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.traccar.api.BaseObjectResource;
 import org.traccar.api.signature.TokenManager;
 import org.traccar.broadcast.BroadcastService;
@@ -47,11 +49,10 @@ import jakarta.ws.rs.core.Response;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.security.GeneralSecurityException;
-import java.util.Collection;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Path("devices")
@@ -76,9 +77,39 @@ public class DeviceResource extends BaseObjectResource<Device> {
 
     @Inject
     private TokenManager tokenManager;
+    private static final Logger LOGGER = LoggerFactory.getLogger(DeviceResource.class);
+    private static final Map<String, String[]> vehicleNamesMap = new HashMap<>();
+
+    static {
+        vehicleNamesMap.put(Device.TYPE_Car, new String[]{"Toyota", "Honda", "Ford"});
+        vehicleNamesMap.put(Device.TYPE_BICYCLE, new String[]{"Harley", "Yamaha", "Ducati"});
+        vehicleNamesMap.put(Device.TYPE_BUS, new String[]{"Volvo", "Scania", "Mack"});
+    }
 
     public DeviceResource() {
         super(Device.class);
+    }
+
+    @GET
+    @Path("types")
+    public Collection<Typed> get() {
+        List<Typed> types = new LinkedList<>();
+        Field[] fields = Device.class.getDeclaredFields();
+        for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers()) && field.getName().startsWith("TYPE_")) {
+                try {
+                    types.add(new Typed(field.get(null).toString()));
+                } catch (IllegalArgumentException | IllegalAccessException error) {
+                    LOGGER.warn("Get event types error", error);
+                }
+            }
+        }
+        return types;
+    }
+    @GET
+    @Path("subtypes")
+    public String[] getVehicleNames(@QueryParam("type") String type) {
+        return vehicleNamesMap.getOrDefault(type, new String[]{});
     }
 
     @GET

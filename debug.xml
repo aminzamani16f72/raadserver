@@ -20,7 +20,7 @@
     <entry key='mail.debug'>true</entry>
 
     <entry key='database.driver'>com.microsoft.sqlserver.jdbc.SQLServerDriver</entry>
-    <entry key='database.url'>jdbc:sqlserver://localhost;databaseName=tc6;encrypt=true;trustServerCertificate=true;;</entry>
+    <entry key='database.url'>jdbc:sqlserver://localhost;databaseName=tc7;encrypt=true;trustServerCertificate=true;;</entry>
 <!--    <entry key='database.url'>jdbc:sqlserver://185.153.185.221;databaseName=tc;encrypt=true;trustServerCertificate=true;;</entry>-->
     <entry key='database.user'>Sa</entry>
     <entry key='database.password'>90121634</entry>

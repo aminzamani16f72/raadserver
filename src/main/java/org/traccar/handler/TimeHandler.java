@@ -15,6 +15,7 @@
  */
 package org.traccar.handler;
 
+import com.github.mfathi91.time.PersianDateTime;
 import com.github.sbahmani.jalcal.util.JalaliDateHelper;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
@@ -28,8 +29,7 @@ import org.traccar.model.Position;
 import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -59,11 +59,23 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
         }
     }
 
+    public static void main(String[] args) {
+        String s1 = "javacup";
+        String s2 = new String(s1);
+        String s3 = new String("javacup");
+        String s4 = "javacup";
+
+        Set<Integer> ids = new HashSet<>();
+        ids.add(System.identityHashCode(s1));
+        ids.add(System.identityHashCode(s2));
+        ids.add(System.identityHashCode(s3));
+        ids.add(System.identityHashCode(s4));
+
+        System.out.println("hello"+ids.size());
+    }
+
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-
-        if (enabled && msg instanceof Position && (protocols == null
-                || protocols.contains(ctx.pipeline().get(BaseProtocolDecoder.class).getProtocolName()))) {
 
             Position position = (Position) msg;
             {
@@ -75,10 +87,11 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
                 var month=jalalidate.substring(2,4);
                 var day=jalalidate.substring(4,6);
 
-                var jalaliTime=JalaliDateHelper.convertToTimeFormat(position.getDeviceTime());
-                var hours=jalaliTime.substring(0,2);
-                var minutes=jalaliTime.substring(2,4);
-                var seconds=jalaliTime.substring(4,6);
+                LocalDateTime utcTime = LocalDateTime.now(ZoneId.of("Asia/Tehran"));
+//                var jalaliTime=JalaliDateHelper.convertToTimeFormat(position.getDeviceTime());
+                var hours=utcTime.getHour()-1;
+                var minutes=utcTime.getMinute();
+                var seconds=utcTime.getSecond();
 
 
                 var persianDate="'" +year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds+"'";
@@ -86,8 +99,21 @@ public class TimeHandler extends ChannelInboundHandlerAdapter {
                 position.setPersianFixTime((persianDate));
             }
 
-        }
+
         ctx.fireChannelRead(msg);
+    }
+    public static String persianDate(){
+        LocalDateTime utcTime = LocalDateTime.now(ZoneId.of("Asia/Tehran"));
+//                var jalaliTime=JalaliDateHelper.convertToTimeFormat(position.getDeviceTime());
+        var hours=utcTime.getHour();
+        var minutes=utcTime.getMinute();
+        var seconds=utcTime.getSecond();
+        LocalDateTime localDateTime = LocalDateTime.now();
+        var jalaliDateFormat=JalaliDateHelper.convertToJalaliDateFormat( Date.from(localDateTime.atZone(ZoneId.of("Asia/Tehran")).toInstant()));
+        var year=jalaliDateFormat.substring(0,2);
+        var month=jalaliDateFormat.substring(2,4);
+        var day=jalaliDateFormat.substring(4,6);
+        return  "'" +year + "/" + month + "/" + day + " " + hours + ":" + minutes + ":" + seconds+"'";
     }
 
 }

@@ -10,7 +10,7 @@
 
     -->
     <entry key='config.useEnvironmentVariables'>true</entry>
-    <entry key='config.time.override'>serverTime</entry>
+<!--    <entry key='config.time.override'>serverTime</entry>-->
     <entry key='report.trip.minimalParkingDuration'>120</entry>
     <entry key='report.trip.useIgnition'>true</entry>
 

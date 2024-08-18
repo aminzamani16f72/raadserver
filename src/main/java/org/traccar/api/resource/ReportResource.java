@@ -20,11 +20,9 @@ import com.github.sbahmani.jalcal.util.DateException;
 import com.github.sbahmani.jalcal.util.JalaliDateHelper;
 import org.apache.kafka.common.protocol.types.Field;
 import org.traccar.api.SimpleObjectResource;
+import org.traccar.api.security.LoginHistory;
 import org.traccar.helper.LogAction;
-import org.traccar.model.Event;
-import org.traccar.model.Position;
-import org.traccar.model.Report;
-import org.traccar.model.UserRestrictions;
+import org.traccar.model.*;
 import org.traccar.reports.CombinedReportProvider;
 import org.traccar.reports.EventsReportProvider;
 import org.traccar.reports.RouteReportProvider;
@@ -51,6 +49,10 @@ import jakarta.ws.rs.core.HttpHeaders;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.StreamingOutput;
+import org.traccar.storage.query.Columns;
+import org.traccar.storage.query.Condition;
+import org.traccar.storage.query.Request;
+
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -103,6 +105,14 @@ public class ReportResource extends SimpleObjectResource<Report> {
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=report.xlsx").build();
         }
     }
+
+    @Path("loginhistory")
+    @GET
+    public Collection<LoginHistory> get() throws StorageException {
+//            permissionsService.checkUser(getUserId(), userId);
+            return storage.getObjects(LoginHistory.class,new Request(new Columns.All(),new Condition.Equals("userId", getUserId())));
+        }
+
 
     @Path("combined")
     @GET
@@ -312,6 +322,7 @@ public class ReportResource extends SimpleObjectResource<Report> {
         });
     }
 
+
     @Path("stops/{type:xlsx|mail}")
     @GET
     @Produces(EXCEL)
@@ -323,5 +334,6 @@ public class ReportResource extends SimpleObjectResource<Report> {
             @PathParam("type") String type) throws StorageException {
         return getStopsExcel(deviceIds, groupIds, from, to, type.equals("mail"));
     }
+
 
 }

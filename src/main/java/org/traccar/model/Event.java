@@ -41,6 +41,8 @@ public class Event extends Message {
     public static final String ALL_EVENTS = "allEvents";
 
     public static final String TYPE_COMMAND_RESULT = "commandResult";
+    public static final String TYPE_DIGITAL_INPUT = "digitalInput";
+    public static final String TYPE_DIGITAL_OUTPUT = "digitalOutput";
 
     public static final String TYPE_DEVICE_ONLINE = "deviceOnline";
     public static final String TYPE_DEVICE_UNKNOWN = "deviceUnknown";
@@ -67,6 +69,7 @@ public class Event extends Message {
     public static final String TYPE_TEXT_MESSAGE = "textMessage";
     public static final String TYPE_DRIVER_CHANGED = "driverChanged";
     public static final String TYPE_MEDIA = "media";
+    public static final String TYPE_Slope_Of_Arm = "slopeOfArm";
 
     private Date eventTime;
 

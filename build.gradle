@@ -92,6 +92,9 @@ dependencies {
 // https://mvnrepository.com/artifact/ir.huri/JalaliCalendar
 // https://mvnrepository.com/artifact/io.github.sbahmani/jalcal
     implementation group: 'io.github.sbahmani', name: 'jalcal', version: '1.6'
+    // https://mvnrepository.com/artifact/com.github.mfathi91/persian-date-time
+    implementation group: 'com.github.mfathi91', name: 'persian-date-time', version: '4.2.1'
+
 
 
 

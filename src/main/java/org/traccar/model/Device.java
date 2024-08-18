@@ -60,6 +60,12 @@ public class Device extends GroupedModel implements Disableable, Schedulable {
     public static final String STATUS_ONLINE = "online";
     public static final String STATUS_OFFLINE = "offline";
 
+    public static final String TYPE_Car="سواری";
+    public static final String TYPE_BUS="اتوبوس";
+    public static final String TYPE_BICYCLE="دوچرخه";
+    public static final String TYPE_PICKUP="وانت";
+    public static final String TYPE_MOTORCYCLE="موتورسیکلت";
+
     private String status;
 
     @QueryIgnore

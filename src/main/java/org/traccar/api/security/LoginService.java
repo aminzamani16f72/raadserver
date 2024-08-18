@@ -16,10 +16,13 @@
 package org.traccar.api.security;
 
 import com.warrenstrange.googleauth.GoogleAuthenticator;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.ws.rs.core.Context;
 import org.traccar.api.signature.TokenManager;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
 import org.traccar.database.LdapProvider;
+import org.traccar.handler.TimeHandler;
 import org.traccar.helper.model.UserUtil;
 import org.traccar.model.User;
 import org.traccar.storage.Storage;
@@ -33,6 +36,9 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 
 @Singleton
 public class LoginService {
@@ -71,40 +77,71 @@ public class LoginService {
         return new LoginResult(user, tokenData.getExpiration());
     }
 
-    public LoginResult login(String email, String password, Integer code) throws StorageException {
+    public LoginResult login(String email, String password, Integer code,HttpServletRequest request) throws StorageException {
         if (forceOpenId) {
             return null;
         }
-
+        LoginHistory loginHistory=new LoginHistory();
         email = email.trim();
         User user = storage.getObject(User.class, new Request(
                 new Columns.All(),
                 new Condition.Or(
                         new Condition.Equals("email", email),
                         new Condition.Equals("login", email))));
+        var loginStatus=user.isPasswordValid(password)?"success":"failed";
         if (user != null) {
             if (ldapProvider != null && user.getLogin() != null && ldapProvider.login(user.getLogin(), password)
                     || !forceLdap && user.isPasswordValid(password)) {
                 checkUserCode(user, code);
                 checkUserEnabled(user);
+                loginHistory.setUserId(user.getId());
+                loginHistory.setLoginTime(TimeHandler.persianDate());
+                loginHistory.setLoginStatus(loginStatus);
+                loginHistory.setIpAddress(LoginService.getClientIp(request));
+                storage.addObjects(loginHistory,new Request(new  Columns.Exclude("id")));
                 return new LoginResult(user);
+            }else {
+                loginHistory.setUserId(user.getId());
+                loginHistory.setLoginTime(TimeHandler.persianDate());
+                loginHistory.setLoginStatus(loginStatus);
+
+                storage.addObjects(loginHistory,new Request(new  Columns.Exclude("id")));
             }
         } else {
             if (ldapProvider != null && ldapProvider.login(email, password)) {
                 user = ldapProvider.getUser(email);
                 user.setId(storage.addObject(user, new Request(new Columns.Exclude("id"))));
                 checkUserEnabled(user);
+                loginHistory.setUserId(user.getId());
+//                loginHistory.setLoginTime(Timestamp.valueOf(LocalDateTime.now()));
+                storage.getObject(LoginHistory.class,new Request(new  Columns.All()));
                 return new LoginResult(user);
             }
         }
         return null;
     }
+    private static String getClientIp(HttpServletRequest request) {
+        String ipAddress = request.getHeader("X-Forwarded-For");
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getHeader("WL-Proxy-Client-IP");
+        }
+        if (ipAddress == null || ipAddress.isEmpty() || "unknown".equalsIgnoreCase(ipAddress)) {
+            ipAddress = request.getRemoteAddr();
+        }
+        if (ipAddress != null && ipAddress.contains(",")) {
+            ipAddress = ipAddress.split(",")[0];
+        }
+        return ipAddress;
+    }
 
-    public LoginResult login(String email, String name, boolean administrator) throws StorageException {
+    public LoginResult login(String email, String name, boolean administrator,HttpServletRequest request) throws StorageException {
         User user = storage.getObject(User.class, new Request(
             new Columns.All(),
             new Condition.Equals("email", email)));
-
+        LoginHistory loginHistory=storage.getObject(LoginHistory.class,new Request(new Columns.All()));
         if (user == null) {
             user = new User();
             UserUtil.setUserDefaults(user, config);
@@ -114,6 +151,8 @@ public class LoginService {
             user.setAdministrator(administrator);
             user.setId(storage.addObject(user, new Request(new Columns.Exclude("id"))));
         }
+        loginHistory.setUserId(user.getId());
+        storage.addObject(loginHistory,new Request(new  Columns.All()));
         checkUserEnabled(user);
         return new LoginResult(user);
     }

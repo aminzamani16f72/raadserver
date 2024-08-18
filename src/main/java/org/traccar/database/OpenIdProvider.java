@@ -190,7 +190,7 @@ public class OpenIdProvider {
         }
 
         User user = loginService.login(
-                userInfo.getEmailAddress(), userInfo.getName(), administrator).getUser();
+                userInfo.getEmailAddress(), userInfo.getName(), administrator,request).getUser();
 
         request.getSession().setAttribute(SessionResource.USER_ID_KEY, user.getId());
         LogAction.login(user.getId(), WebHelper.retrieveRemoteAddress(request));

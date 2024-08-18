@@ -118,7 +118,7 @@ public class SessionResource extends BaseResource {
             @FormParam("code") Integer code) throws StorageException {
         User user;
         try {
-            user = loginService.login(email, password, code).getUser();
+            user = loginService.login(email, password, code,request).getUser();
         } catch (CodeRequiredException e) {
             Response response = Response
                     .status(Response.Status.UNAUTHORIZED)
@@ -142,6 +142,7 @@ public class SessionResource extends BaseResource {
         request.getSession().removeAttribute(USER_ID_KEY);
         return Response.noContent().build();
     }
+
 
     @Path("token")
     @POST

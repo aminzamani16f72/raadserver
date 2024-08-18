@@ -47,6 +47,7 @@
   <include file="changelog-5.14.xml" relativeToChangelogFile="true" />
   <include file="changelog-5.15.xml" relativeToChangelogFile="true" />
   <include file="changelog-6.1.xml" relativeToChangelogFile="true" />
+  <include file="changelog-6.2.xml" relativeToChangelogFile="true" />
 
 
 
