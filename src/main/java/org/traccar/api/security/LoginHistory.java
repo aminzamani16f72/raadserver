@@ -9,7 +9,7 @@ import java.util.Date;
 public class LoginHistory {
 
     private Long id;
-    private String loginTime;
+    private Date loginTime;
     private Long userId;
     private String ipAddress;
     private String userAgent;
@@ -19,7 +19,7 @@ public class LoginHistory {
     // Constructors
     public LoginHistory() {}
 
-    public LoginHistory(String loginTime, Long userId, String ipAddress, String userAgent, String loginStatus, String failureReason) {
+    public LoginHistory(Date loginTime, Long userId, String ipAddress, String userAgent, String loginStatus, String failureReason) {
         this.loginTime = loginTime;
         this.userId = userId;
         this.ipAddress = ipAddress;
@@ -31,11 +31,11 @@ public class LoginHistory {
     // Getters and Setters
 
 
-    public String getLoginTime() {
+    public Date getLoginTime() {
         return loginTime;
     }
 
-    public void setLoginTime(String loginTime) {
+    public void setLoginTime(Date loginTime) {
         this.loginTime = loginTime;
     }
 

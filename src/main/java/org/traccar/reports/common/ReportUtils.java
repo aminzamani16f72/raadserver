@@ -63,6 +63,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 public class ReportUtils {
@@ -358,6 +359,7 @@ public class ReportUtils {
 
         return result;
     }
+
 
     public <T extends BaseReportItem> List<T> fastTripsAndStops(
             Device device, Date from, Date to, Class<T> reportClass) throws StorageException {

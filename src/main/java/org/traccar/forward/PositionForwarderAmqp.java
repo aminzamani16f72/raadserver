@@ -41,6 +41,7 @@ public class PositionForwarderAmqp implements PositionForwarder {
             String value = objectMapper.writeValueAsString(positionData);
             amqpClient.publishMessage(value);
             resultHandler.onResult(true, null);
+            amqpClient.receiveMessages();
         } catch (IOException e) {
             resultHandler.onResult(false, e);
         }

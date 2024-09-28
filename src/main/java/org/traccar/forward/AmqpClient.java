@@ -15,11 +15,7 @@
  */
 package org.traccar.forward;
 
-import com.rabbitmq.client.BuiltinExchangeType;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.MessageProperties;
+import com.rabbitmq.client.*;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -47,6 +43,8 @@ public class AmqpClient {
             Connection connection = factory.newConnection();
             channel = connection.createChannel();
             channel.exchangeDeclare(exchange, BuiltinExchangeType.TOPIC, true);
+            channel.queueDeclare("traccar queue", false, false, false, null);
+            channel.queueBind("traccar queue", exchange, topic);
         } catch (IOException | TimeoutException e) {
             throw new RuntimeException("Error while creating and configuring RabbitMQ channel", e);
         }
@@ -54,5 +52,15 @@ public class AmqpClient {
 
     public void publishMessage(String message) throws IOException {
         channel.basicPublish(exchange, topic, MessageProperties.PERSISTENT_TEXT_PLAIN, message.getBytes());
+        System.out.println("Message published: " + message);
     }
-}
+
+    public void receiveMessages() throws IOException {
+        DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+            String message = new String(delivery.getBody(), "UTF-8");
+            System.out.println("Received message: " + message);
+        };
+
+        // Start consuming messages from the queue
+        channel.basicConsume("traccar queue", true, deliverCallback, consumerTag -> {});
+    }}

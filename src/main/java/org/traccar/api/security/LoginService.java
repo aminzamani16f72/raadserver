@@ -18,6 +18,7 @@ package org.traccar.api.security;
 import com.warrenstrange.googleauth.GoogleAuthenticator;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.ws.rs.core.Context;
+import net.fortuna.ical4j.model.DateTime;
 import org.traccar.api.signature.TokenManager;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
@@ -36,6 +37,7 @@ import jakarta.inject.Inject;
 import jakarta.inject.Singleton;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
@@ -77,6 +79,7 @@ public class LoginService {
         return new LoginResult(user, tokenData.getExpiration());
     }
 
+
     public LoginResult login(String email, String password, Integer code,HttpServletRequest request) throws StorageException {
         if (forceOpenId) {
             return null;
@@ -95,14 +98,14 @@ public class LoginService {
                 checkUserCode(user, code);
                 checkUserEnabled(user);
                 loginHistory.setUserId(user.getId());
-                loginHistory.setLoginTime(TimeHandler.persianDate());
+                loginHistory.setLoginTime(Date.from( LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
                 loginHistory.setLoginStatus(loginStatus);
                 loginHistory.setIpAddress(LoginService.getClientIp(request));
                 storage.addObjects(loginHistory,new Request(new  Columns.Exclude("id")));
                 return new LoginResult(user);
             }else {
                 loginHistory.setUserId(user.getId());
-                loginHistory.setLoginTime(TimeHandler.persianDate());
+                loginHistory.setLoginTime(Date.from( LocalDateTime.now().atZone(ZoneId.systemDefault()).toInstant()));
                 loginHistory.setLoginStatus(loginStatus);
 
                 storage.addObjects(loginHistory,new Request(new  Columns.Exclude("id")));

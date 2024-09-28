@@ -19,12 +19,14 @@ package org.traccar.reports;
 import org.apache.poi.ss.util.WorkbookUtil;
 import org.traccar.config.Config;
 import org.traccar.config.Keys;
+import org.traccar.helper.model.AttributeUtil;
 import org.traccar.helper.model.DeviceUtil;
 import org.traccar.helper.model.PositionUtil;
 import org.traccar.model.Device;
 import org.traccar.model.Group;
 import org.traccar.model.Position;
 import org.traccar.reports.common.ReportUtils;
+import org.traccar.reports.common.TripsConfig;
 import org.traccar.reports.model.DeviceReportSection;
 import org.traccar.storage.Storage;
 import org.traccar.storage.StorageException;
@@ -39,11 +41,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class RouteReportProvider {
 
@@ -109,5 +113,29 @@ public class RouteReportProvider {
             context.putVar("to", to);
             reportUtils.processTemplateWithSheets(inputStream, outputStream, context);
         }
+    }
+    public String calculateIgnitionON(
+            Long deviceId, Date from, Date to) throws StorageException {
+        long l = 0;
+        long timeStamp = 0;
+        long diffInSeconds=0;
+        long diffInMinutes=0;
+        long diffInHours=0;
+
+        var positions = PositionUtil.getPositions(storage, deviceId, from, to);
+        if (!positions.isEmpty()) {
+            for (int i = 0; i < positions.size() - 1; i++) {
+                boolean Motion = positions.get(i).getBoolean(Position.KEY_MOTION);
+                if (Motion) {
+                    l = positions.get(i + 1).getFixTime().getTime() - positions.get(i).getFixTime().getTime();
+                    timeStamp += l;
+                }
+            }
+            Duration duration = Duration.ofMillis(timeStamp);
+            diffInHours = duration.toHours();
+            diffInMinutes = duration.toMinutesPart();
+            diffInSeconds = duration.toSecondsPart();
+        }
+        return  String.format("%02d", diffInHours) + ":" +String.format("%02d", diffInMinutes)  + ":" + String.format("%02d", diffInSeconds) ;
     }
 }

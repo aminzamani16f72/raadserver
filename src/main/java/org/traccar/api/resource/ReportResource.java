@@ -53,9 +53,8 @@ import org.traccar.storage.query.Columns;
 import org.traccar.storage.query.Condition;
 import org.traccar.storage.query.Request;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.Calendar;
 
 @Path("reports")
 @Produces(MediaType.APPLICATION_JSON)
@@ -155,6 +154,50 @@ public class ReportResource extends SimpleObjectResource<Report> {
             routeReportProvider.getExcel(stream, getUserId(), deviceIds, groupIds, fromDate, toDate);
         });
     }
+    @Path("ignitionon")
+    @GET
+    public String getIgnitionOn(
+            @QueryParam("deviceId") Long deviceId,
+            @QueryParam("from") Date from,
+            @QueryParam("to") Date to)
+            throws StorageException, DateException{
+
+        return routeReportProvider.calculateIgnitionON(deviceId,from,to);
+    }
+    @Path("ignitionondiagram")
+    @GET
+    public Collection<Map<String,Object>> getIgnitionDiagram(
+            @QueryParam("deviceId") Long deviceId,
+            @QueryParam("from") Date fromDate,
+            @QueryParam("to") Date toDate)
+            throws StorageException, DateException{
+//        var fromDate= JalaliDateHelper.extractDateFromJalaliDateTime(from.substring(0,8),from.substring(8,14));
+//        var toDate=JalaliDateHelper.extractDateFromJalaliDateTime(to.substring(0,8),to.substring(8,14));
+        List<Map<String, Object>> resultList = new ArrayList<>();
+        java.util.Calendar calendar= java.util.Calendar.getInstance();
+        calendar.setTime(fromDate);
+        // Add one day to the current date
+        calendar.add(Calendar.DAY_OF_YEAR, 1);
+
+        // Get the new Date object
+        Date nextDay = calendar.getTime();
+
+        while(fromDate.compareTo(toDate) <= 0){
+            var dayReport=routeReportProvider.calculateIgnitionON(deviceId,fromDate,nextDay);
+            Map<String,Object> result=new HashMap<>();
+            result.put("deviceTime",fromDate);
+            result.put("ignition",dayReport);
+            fromDate=nextDay;
+            calendar.setTime(fromDate);
+            // Add one day to the current date
+            calendar.add(Calendar.DAY_OF_YEAR, 1);
+            nextDay=calendar.getTime();
+            resultList.add(result);
+        }
+        return resultList;
+    }
+
+
 
     @Path("route/{type:xlsx|mail}")
     @GET

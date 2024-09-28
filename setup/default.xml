@@ -9,6 +9,17 @@
     DO NOT MODIFY THIS FILE. Use traccar.xml instead.
 
     -->
+<!--    configure rabbit mq-->
+    <entry key='forward.enable'>true</entry>
+    <entry key='forward.type'>amqp</entry>
+    <entry key='forward.url'>amqp://guest:guest@rabbitmq-127.0.0.1:5627</entry>
+    <entry key='forward.retry.enable'>true</entry>
+<!--    <entry key='forward.retry.delay'>50</entry>-->
+    <entry key='forward.exchange'>t</entry>
+    <entry key='forward.topic'>p</entry>
+
+
+
     <entry key='config.useEnvironmentVariables'>true</entry>
 <!--    <entry key='config.time.override'>serverTime</entry>-->
     <entry key='report.trip.minimalParkingDuration'>120</entry>
