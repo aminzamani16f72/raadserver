@@ -14,9 +14,8 @@
     <entry key='forward.type'>amqp</entry>
     <entry key='forward.url'>amqp://guest:guest@rabbitmq-127.0.0.1:5627</entry>
     <entry key='forward.retry.enable'>true</entry>
-<!--    <entry key='forward.retry.delay'>50</entry>-->
-    <entry key='forward.exchange'>t</entry>
-    <entry key='forward.topic'>p</entry>
+    <entry key='forward.exchange'>traccar2</entry>
+    <entry key='forward.topic'>test3</entry>
 
 
 

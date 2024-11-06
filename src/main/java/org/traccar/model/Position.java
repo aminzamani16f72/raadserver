@@ -55,7 +55,7 @@ public class Position extends Message {
     // The preferred units of measure are specified in the comment for each.
     public static final String KEY_POWER = "power"; // volts
     public static final String KEY_BATTERY = "battery"; // volts
-    public static final String KEY_BATTERY_LEVEL = "batteryLevel"; // percentage
+    public static final String KEY_BATTERY_LEVEL = "io113"; // percentage
     public static final String KEY_SLOPE_OF_ARM_LEVEL = "slope"; //
     public static final String KEY_FUEL_LEVEL = "fuel"; // liters
     public static final String KEY_FUEL_USED = "fuelUsed"; // liters

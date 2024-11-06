@@ -75,6 +75,8 @@ public final class Main {
     }
 
     public static void main(String[] args) throws Exception {
+        System.out.println(System.getProperty("java.class.path"));
+
         Locale.setDefault(Locale.ENGLISH);
 
         final String configFile;

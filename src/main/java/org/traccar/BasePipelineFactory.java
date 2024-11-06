@@ -49,6 +49,8 @@ import org.traccar.handler.events.BehaviorEventHandler;
 import org.traccar.handler.events.CommandResultEventHandler;
 import org.traccar.handler.events.DriverEventHandler;
 import org.traccar.handler.events.FuelEventHandler;
+import org.traccar.handler.events.SpeedEventHandler;
+import org.traccar.handler.events.BatteryEventHandler;
 import org.traccar.handler.events.GeofenceEventHandler;
 import org.traccar.handler.events.IgnitionEventHandler;
 import org.traccar.handler.events.MaintenanceEventHandler;
@@ -157,6 +159,7 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
                 GeofenceHandler.class,
                 GeocoderHandler.class,
                 SpeedLimitHandler.class,
+                BatteryEventHandler.class,
                 MotionHandler.class,
                 CopyAttributesHandler.class,
                 EngineHoursHandler.class,
@@ -168,6 +171,7 @@ public abstract class BasePipelineFactory extends ChannelInitializer<Channel> {
                 OverspeedEventHandler.class,
                 BehaviorEventHandler.class,
                 FuelEventHandler.class,
+                SpeedEventHandler.class,
                 MotionEventHandler.class,
                 GeofenceEventHandler.class,
                 AlertEventHandler.class,

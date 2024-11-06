@@ -1139,6 +1139,15 @@ public final class Keys {
     /**
      * AWS Access Key with SNS permission.
      */
+    public static final ConfigKey<String> SMS_HOST_URL = new StringConfigKey(
+            "sms.http.host",
+            List.of(KeyType.CONFIG));
+    public static final ConfigKey<String> SMS_API_KEY = new StringConfigKey(
+            "sms.api.key",
+            List.of(KeyType.CONFIG));
+    public static final ConfigKey<String> SMS_SENDER = new StringConfigKey(
+            "sms.number.sender",
+            List.of(KeyType.CONFIG));
     public static final ConfigKey<String> SMS_AWS_ACCESS = new StringConfigKey(
             "sms.aws.access",
             List.of(KeyType.CONFIG));

@@ -170,6 +170,7 @@ public class DeviceResource extends BaseObjectResource<Device> {
                                     "WHERE tud.userid = +"+getUserId()+" OR rc.manageduserid IS NOT NULL\n" +
                                     " )"
                             ;
+
                     conditions.add(new Condition.Permission(User.class,getUserId(), baseClass));
                     return storage.getobjectByQueryAndCondition(baseClass,query,Condition.merge(conditions));
                 } else {

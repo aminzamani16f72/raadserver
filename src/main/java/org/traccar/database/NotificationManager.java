@@ -116,9 +116,9 @@ public class NotificationManager {
                 notifications.size());
 
         if (!notifications.isEmpty()) {
-            if (position != null && position.getAddress() == null && geocodeOnRequest && geocoder != null) {
-                position.setAddress(geocoder.getAddress(position.getLatitude(), position.getLongitude(), null));
-            }
+//            if (position != null && position.getAddress() == null && geocodeOnRequest && geocoder != null) {
+//                position.setAddress(geocoder.getAddress(position.getLatitude(), position.getLongitude(), null));
+//            }
 
             notifications.forEach(notification -> {
                 cacheManager.getNotificationUsers(notification.getId(), event.getDeviceId()).forEach(user -> {

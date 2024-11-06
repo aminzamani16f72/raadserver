@@ -77,33 +77,35 @@ public class MotionEventHandler extends BaseEventHandler {
             return null;
         }
         var speed= UnitsConverter.kphFromKnots(position.getSpeed()) ;
-           try {
-               if(!batteryFlag && (Long)position.getAttributes().get("io113")<15){
-                   Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("alarm","lowBattery");
-                   attribute.put("messageFa","باطری دستگاه"+" "+device.getName()+" " +" ضعیف است");
-
-                   Event eventLowBattery=new Event(Event.TYPE_ALARM,deviceId);
-                   eventLowBattery.setPositionId(position.getId());
-                   eventLowBattery.setAttributes(attribute);
-                   events.put(eventLowBattery, position);
-                   batteryFlag=true;
-                   } else if ((Long)position.getAttributes().get("io113")>15) {
-                   batteryFlag=false;
-
-               }
-               if (speed > (speedLimit)) {
-                   Event eventSpeed=new Event(Event.TYPE_DEVICE_OVERSPEED, deviceId);
-                   eventSpeed.setPositionId(position.getId());
-                   Map<String,Object> attribute=new HashMap<>();
-                   String message="سرعت دستگاه "+" "+device.getName()+" " + " از حد مجاز فراتر رفت";
-                   String formattedSpeed = String.format("%.2f", speed);
-                   attribute.put("messageFa",message);
-                   eventSpeed.setAttributes(attribute);
-                   events.put(eventSpeed, position);
-               }
-
-               if(!inputDigitalFlagON && Optional.of(position.getAttributes().get("in1").equals(true)).orElse(false)){
+        try {
+//            if(position.hasAttribute(Position.KEY_BATTERY_LEVEL)) {
+//                if (!batteryFlag && (Long) position.getAttributes().get("io113") < 15) {
+//                    Map<String, Object> attribute = new HashMap<>();
+//                    attribute.put("alarm", "lowBattery");
+//                    attribute.put("messageFa", "باطری دستگاه" + " " + device.getName() + " " + " ضعیف است");
+//
+//                    Event eventLowBattery = new Event(Event.TYPE_ALARM, deviceId);
+//                    eventLowBattery.setPositionId(position.getId());
+//                    eventLowBattery.setAttributes(attribute);
+//                    events.put(eventLowBattery, position);
+//                    batteryFlag = true;
+//                } else if ((Long) position.getAttributes().get("io113") > 15) {
+//                    batteryFlag = false;
+//
+//                }
+//            }
+//            if (speed > (speedLimit)) {
+//                Event eventSpeed=new Event(Event.TYPE_DEVICE_OVERSPEED, deviceId);
+//                eventSpeed.setPositionId(position.getId());
+//                Map<String,Object> attribute=new HashMap<>();
+//                String message="سرعت دستگاه "+" "+device.getName()+" " + " از حد مجاز فراتر رفت";
+//                String formattedSpeed = String.format("%.2f", speed);
+//                attribute.put("messageFa",message);
+//                eventSpeed.setAttributes(attribute);
+//                events.put(eventSpeed, position);
+//            }
+               if(position.hasAttribute(Position.KEY_INPUT)){
+                if(!inputDigitalFlagON && position.getAttributes().get("in1").equals(true)){
                    Event eventDigitalInput=new Event(Event.TYPE_DIGITAL_INPUT,deviceId);
                    inputDigitalFlagON = true;
                    Map<String,Object> attribute=new HashMap<>();
@@ -116,16 +118,16 @@ public class MotionEventHandler extends BaseEventHandler {
                } else if (!inputDigitalFlagOff && Optional.ofNullable(position.getAttributes().get("in1"))
                        .map(out1 -> out1.equals(false))
                        .orElse(false)) {
-                   inputDigitalFlagON =false;
-                   Event eventDigitalInput=new Event(Event.TYPE_DIGITAL_INPUT,deviceId);
-                   Map<String,Object> attribute=new HashMap<>();
-                   String message="ورودی دیجیتال دستگاه "+" "+device.getName()+" " + " غیر فعال شد";
-                   attribute.put("messageFa",message);
+                   inputDigitalFlagON = false;
+                   Event eventDigitalInput = new Event(Event.TYPE_DIGITAL_INPUT, deviceId);
+                   Map<String, Object> attribute = new HashMap<>();
+                   String message = "ورودی دیجیتال دستگاه " + " " + device.getName() + " " + " غیر فعال شد";
+                   attribute.put("messageFa", message);
                    eventDigitalInput.setAttributes(attribute);
                    eventDigitalInput.setPositionId(position.getId());
                    events.put(eventDigitalInput, position);
-                   inputDigitalFlagOff=true;
-
+                   inputDigitalFlagOff = true;
+               }
                }if(!outputDigitalFlagOn && Optional.ofNullable((Boolean)position.getAttributes().get("out1")).orElse(false)){
                    Event eventDigitalOut=new Event(Event.TYPE_DIGITAL_OUTPUT,deviceId);
                    outputDigitalFlagOn = true;
@@ -149,62 +151,62 @@ public class MotionEventHandler extends BaseEventHandler {
                    events.put(eventDigitalOut, position);
                    outputDigitalFlagOff = true;
                }
-               if(Optional.ofNullable ((Long) position.getAttributes().get("io161")).orElse(0L)>slopeLimit){
-                   Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("alarm","slopeOfArm");
-                   attribute.put("messageFa","شیب دستگاه"+" "+device.getName()+" " +" از حد مجاز بیشتر شد");
+            if(Optional.ofNullable ((Long) position.getAttributes().get("io161")).orElse(0L)>slopeLimit){
+                Map<String,Object> attribute=new HashMap<>();
+                attribute.put("alarm","slopeOfArm");
+                attribute.put("messageFa","شیب دستگاه"+" "+device.getName()+" " +" از حد مجاز بیشتر شد");
 
-                   Event eventSlopeOfArm=new Event(Event.TYPE_Slope_Of_Arm,deviceId);
-                   eventSlopeOfArm.setPositionId(position.getId());
-                   eventSlopeOfArm.setAttributes(attribute);
-                   events.put(eventSlopeOfArm, position);
-               }
-               if(Optional.ofNullable ((Long) position.getAttributes().get("io249")).orElse(0L)==1){
-                   Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("alarm","jamming");
-                   attribute.put("messageFa","جمینگ در دستگاه"+" "+device.getName()+" " +" رخ داد");
+                Event eventSlopeOfArm=new Event(Event.TYPE_Slope_Of_Arm,deviceId);
+                eventSlopeOfArm.setPositionId(position.getId());
+                eventSlopeOfArm.setAttributes(attribute);
+                events.put(eventSlopeOfArm, position);
+            }
+            if(Optional.ofNullable ((Long) position.getAttributes().get("io249")).orElse(0L)==1){
+                Map<String,Object> attribute=new HashMap<>();
+                attribute.put("alarm","jamming");
+                attribute.put("messageFa","جمینگ در دستگاه"+" "+device.getName()+" " +" رخ داد");
 
-                   Event eventJamming=new Event(Event.TYPE_ALARM,deviceId);
-                   eventJamming.setPositionId(position.getId());
-                   eventJamming.setAttributes(attribute);
-                   events.put(eventJamming, position);
-               }
-               if(!towFlag && Optional.ofNullable ((Long) position.getAttributes().get("io246")).orElse(0L)==1){
-                   Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("alarm","tow");
-                   attribute.put("messageFa","بکسل در  دستگاه"+" "+device.getName()+" " +" فعال شد");
+                Event eventJamming=new Event(Event.TYPE_ALARM,deviceId);
+                eventJamming.setPositionId(position.getId());
+                eventJamming.setAttributes(attribute);
+                events.put(eventJamming, position);
+            }
+            if(!towFlag && Optional.ofNullable ((Long) position.getAttributes().get("io246")).orElse(0L)==1){
+                Map<String,Object> attribute=new HashMap<>();
+                attribute.put("alarm","tow");
+                attribute.put("messageFa","بکسل در  دستگاه"+" "+device.getName()+" " +" فعال شد");
 
-                   Event eventTow=new Event(Event.TYPE_ALARM,deviceId);
-                   eventTow.setPositionId(position.getId());
-                   eventTow.setAttributes(attribute);
-                   events.put(eventTow, position);
-                   towFlag=true;
-               }
-               else if (Optional.ofNullable ((Long) position.getAttributes().get("io246")).orElse(2L)==0){
-                   towFlag=false;
-               }
-               if(!powerCutFlag && Optional.ofNullable ((Long) position.getAttributes().get("io252")).orElse(2L)==1){
-                   Map<String,Object> attribute=new HashMap<>();
-                   attribute.put("alarm","powerCut");
-                   attribute.put("messageFa","باطری  دستگاه"+" "+device.getName()+" " +" جدا شد");
+                Event eventTow=new Event(Event.TYPE_ALARM,deviceId);
+                eventTow.setPositionId(position.getId());
+                eventTow.setAttributes(attribute);
+                events.put(eventTow, position);
+                towFlag=true;
+            }
+            else if (Optional.ofNullable ((Long) position.getAttributes().get("io246")).orElse(2L)==0){
+                towFlag=false;
+            }
+            if(!powerCutFlag && Optional.ofNullable ((Long) position.getAttributes().get("io252")).orElse(2L)==1){
+                Map<String,Object> attribute=new HashMap<>();
+                attribute.put("alarm","powerCut");
+                attribute.put("messageFa","باطری  دستگاه"+" "+device.getName()+" " +" جدا شد");
 
-                   Event eventPowerCut=new Event(Event.TYPE_ALARM,deviceId);
-                   eventPowerCut.setPositionId(position.getId());
-                   eventPowerCut.setAttributes(attribute);
-                   events.put(eventPowerCut, position);
-                   powerCutFlag=true;
-               }
-               else if (Optional.ofNullable ((Long) position.getAttributes().get("io252")).orElse(2L)==0){
-                   powerCutFlag=false;
-               }
+                Event eventPowerCut=new Event(Event.TYPE_ALARM,deviceId);
+                eventPowerCut.setPositionId(position.getId());
+                eventPowerCut.setAttributes(attribute);
+                events.put(eventPowerCut, position);
+                powerCutFlag=true;
+            }
+            else if (Optional.ofNullable ((Long) position.getAttributes().get("io252")).orElse(2L)==0){
+                powerCutFlag=false;
+            }
 
-               return events;
+            return events;
 
-           } catch (ClassCastException | NullPointerException e) {
-               // Handle exceptions appropriately
-               // Log error or send error response via WebSocket
-               System.out.println("catch");
-           }
+        } catch (ClassCastException | NullPointerException e) {
+            // Handle exceptions appropriately
+            // Log error or send error response via WebSocket
+            System.out.println("catch");
+        }
 
 
 

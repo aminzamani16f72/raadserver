@@ -6,6 +6,7 @@ plugins {
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
 }
 
 sourceCompatibility = "11"
@@ -89,6 +90,14 @@ dependencies {
     testImplementation "org.junit.jupiter:junit-jupiter-engine:$junitVersion"
     testImplementation "org.mockito:mockito-core:5.8.0"
     implementation 'joda-time:joda-time:2.10.14'
+    // https://mvnrepository.com/artifact/com.github.kavenegar/kavenegar-java
+    implementation group: 'com.github.kavenegar', name: 'kavenegar-java', version: '2.0.3'
+
+
+
+
+
+
 // https://mvnrepository.com/artifact/ir.huri/JalaliCalendar
 // https://mvnrepository.com/artifact/io.github.sbahmani/jalcal
     implementation group: 'io.github.sbahmani', name: 'jalcal', version: '1.6'

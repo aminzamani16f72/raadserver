@@ -35,6 +35,7 @@ import org.traccar.storage.query.Condition;
 import org.traccar.storage.query.Request;
 
 import jakarta.inject.Inject;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -42,11 +43,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Paths;
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class RouteReportProvider {
@@ -65,11 +62,11 @@ public class RouteReportProvider {
     }
 
     public Collection<Position> getObjects(long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
-            Date from, Date to) throws StorageException {
+                                           Date from, Date to) throws StorageException {
         reportUtils.checkPeriodLimit(from, to);
 
         ArrayList<Position> result = new ArrayList<>();
-        for (Device device: DeviceUtil.getAccessibleDevices(storage, userId, deviceIds, groupIds)) {
+        for (Device device : DeviceUtil.getAccessibleDevices(storage, userId, deviceIds, groupIds)) {
             result.addAll(PositionUtil.getPositions(storage, device.getId(), from, to));
         }
         return result;
@@ -82,13 +79,13 @@ public class RouteReportProvider {
     }
 
     public void getExcel(OutputStream outputStream,
-            long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
-            Date from, Date to) throws StorageException, IOException {
+                         long userId, Collection<Long> deviceIds, Collection<Long> groupIds,
+                         Date from, Date to) throws StorageException, IOException {
         reportUtils.checkPeriodLimit(from, to);
 
         ArrayList<DeviceReportSection> devicesRoutes = new ArrayList<>();
         ArrayList<String> sheetNames = new ArrayList<>();
-        for (Device device: DeviceUtil.getAccessibleDevices(storage, userId, deviceIds, groupIds)) {
+        for (Device device : DeviceUtil.getAccessibleDevices(storage, userId, deviceIds, groupIds)) {
             var positions = PositionUtil.getPositions(storage, device.getId(), from, to);
             DeviceReportSection deviceRoutes = new DeviceReportSection();
             deviceRoutes.setDeviceName(device.getName());
@@ -114,13 +111,14 @@ public class RouteReportProvider {
             reportUtils.processTemplateWithSheets(inputStream, outputStream, context);
         }
     }
+
     public String calculateIgnitionON(
             Long deviceId, Date from, Date to) throws StorageException {
         long l = 0;
         long timeStamp = 0;
-        long diffInSeconds=0;
-        long diffInMinutes=0;
-        long diffInHours=0;
+        long diffInSeconds = 0;
+        long diffInMinutes = 0;
+        long diffInHours = 0;
 
         var positions = PositionUtil.getPositions(storage, deviceId, from, to);
         if (!positions.isEmpty()) {
@@ -136,6 +134,36 @@ public class RouteReportProvider {
             diffInMinutes = duration.toMinutesPart();
             diffInSeconds = duration.toSecondsPart();
         }
-        return  String.format("%02d", diffInHours) + ":" +String.format("%02d", diffInMinutes)  + ":" + String.format("%02d", diffInSeconds) ;
+        return String.format("%02d", diffInHours) + ":" + String.format("%02d", diffInMinutes) + ":" + String.format("%02d", diffInSeconds);
+    }
+
+    public Collection<Map<Date, Long>> calculateIgnitionOff(Long deviceId, Date from, Date to, Long threshold) throws StorageException {
+        List<Map<Date, Long>> resultList = new ArrayList<>();
+        var positions = PositionUtil.getPositions(storage, deviceId, from, to);
+
+        if (!positions.isEmpty()) {
+            long totalTimeOff = 0;  // Total time ignition was off
+            Date lastTime = null;   // To track the last position's timestamp
+
+            for (int i = 0; i < positions.size() - 1; i++) {
+                boolean isMotion = positions.get(i).getBoolean(Position.KEY_MOTION);
+                if (!isMotion) {
+                    lastTime = positions.get(i).getFixTime();
+                    while (i < positions.size() - 1 && !positions.get(i).getBoolean(Position.KEY_MOTION)) {
+                        long timeDifference = positions.get(i + 1).getFixTime().getTime() - positions.get(i).getFixTime().getTime();
+                        totalTimeOff += timeDifference;
+                        i++;
+                    }
+                    long diffInMinutes = Duration.ofMillis(totalTimeOff).toMinutes();
+                    if (diffInMinutes > threshold) {
+                        Map<Date, Long> result = new HashMap<>();
+                        result.put(lastTime, diffInMinutes);
+                        resultList.add(result);
+                    }
+                    totalTimeOff = 0; // Reset time for the next period
+                }
+            }
+        }
+        return resultList;
     }
 }
