@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="changelog-5.15">
+
+  <changeSet author="author" id="changelog-5.15">
+    <addColumn tableName="tc_drivers">
+      <column name="device_id" type="INT"/>
+    </addColumn>
+
+    <addForeignKeyConstraint
+            baseTableName="tc_drivers"
+            baseColumnNames="device_id"
+            constraintName="fk_drivers_devices"
+            referencedTableName="tc_devices"
+            referencedColumnNames="id"/>
+
+  </changeSet>
+
+</databaseChangeLog>

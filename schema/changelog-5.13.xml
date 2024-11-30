@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd"
+  logicalFilePath="changelog-5.13">
+
+  <changeSet author="author" id="changelog-5.13">
+
+
+<!--    <dropColumn tableName="tc_devices">-->
+<!--      <column name="license_plate" type="VARCHAR(128)" />-->
+<!--    </dropColumn>-->
+
+    <addColumn tableName="tc_devices">
+      <column name="licensePlate" type="VARCHAR(128)" />
+    </addColumn>
+
+
+    <addColumn tableName="tc_devices">
+      <column name="enginnumber" type="VARCHAR(128)" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="identificationnumber" type="VARCHAR(128)" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="color" type="VARCHAR(128)" />
+    </addColumn>
+
+    <addColumn tableName="tc_devices">
+      <column name="vehicletype" type="VARCHAR(128)" />
+    </addColumn>
+
+
+  </changeSet>
+
+</databaseChangeLog>
