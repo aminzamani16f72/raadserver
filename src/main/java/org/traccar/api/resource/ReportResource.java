@@ -199,7 +199,7 @@ public class ReportResource extends SimpleObjectResource<Report> {
     }
     @Path("ignitionoff")
     @GET
-    public Collection<Map<String,Object>> getIgnitionDiagram(
+    public Collection<Map<String,Object>> getStopTime(
             @QueryParam("deviceId") Long deviceId,
             @QueryParam("from") Date fromDate,
             @QueryParam("to") Date toDate,

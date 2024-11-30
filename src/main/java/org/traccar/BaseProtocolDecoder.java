@@ -31,6 +31,8 @@ import org.traccar.session.DeviceSession;
 import org.traccar.session.cache.CacheManager;
 
 import jakarta.inject.Inject;
+import org.traccar.storage.StorageException;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.Collection;
@@ -169,7 +171,7 @@ public abstract class BaseProtocolDecoder extends ExtendedObjectDecoder {
 
     @Override
     protected void onMessageEvent(
-            Channel channel, SocketAddress remoteAddress, Object originalMessage, Object decodedMessage) {
+            Channel channel, SocketAddress remoteAddress, Object originalMessage, Object decodedMessage) throws StorageException {
         if (statisticsManager != null) {
             statisticsManager.registerMessageReceived();
         }

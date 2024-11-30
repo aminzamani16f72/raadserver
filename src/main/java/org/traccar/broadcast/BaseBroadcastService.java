@@ -24,6 +24,7 @@ import org.traccar.model.Event;
 import org.traccar.model.ObjectOperation;
 import org.traccar.model.Permission;
 import org.traccar.model.Position;
+import org.traccar.storage.StorageException;
 
 public abstract class BaseBroadcastService implements BroadcastService {
 
@@ -98,7 +99,13 @@ public abstract class BaseBroadcastService implements BroadcastService {
 
     protected void handleMessage(BroadcastMessage message) throws Exception {
         if (message.getDevice() != null) {
-            listeners.forEach(listener -> listener.updateDevice(false, message.getDevice()));
+            listeners.forEach(listener -> {
+                try {
+                    listener.updateDevice(false, message.getDevice());
+                } catch (StorageException e) {
+                    throw new RuntimeException(e);
+                }
+            });
         } else if (message.getPosition() != null) {
             listeners.forEach(listener -> listener.updatePosition(false, message.getPosition()));
         } else if (message.getUserId() != null && message.getEvent() != null) {

@@ -20,10 +20,11 @@ import org.traccar.model.Device;
 import org.traccar.model.Event;
 import org.traccar.model.ObjectOperation;
 import org.traccar.model.Position;
+import org.traccar.storage.StorageException;
 
 public interface BroadcastInterface {
 
-    default void updateDevice(boolean local, Device device) {
+    default void updateDevice(boolean local, Device device) throws StorageException {
     }
 
     default void updatePosition(boolean local, Position position) {

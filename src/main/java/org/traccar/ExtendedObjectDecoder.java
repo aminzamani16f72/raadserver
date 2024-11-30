@@ -28,6 +28,8 @@ import org.traccar.helper.DataConverter;
 import org.traccar.model.Position;
 
 import jakarta.inject.Inject;
+import org.traccar.storage.StorageException;
+
 import java.net.SocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.util.Collection;
@@ -99,7 +101,7 @@ public abstract class ExtendedObjectDecoder extends ChannelInboundHandlerAdapter
     }
 
     protected void onMessageEvent(
-            Channel channel, SocketAddress remoteAddress, Object originalMessage, Object decodedMessage) {
+            Channel channel, SocketAddress remoteAddress, Object originalMessage, Object decodedMessage) throws StorageException {
     }
 
     protected Object handleEmptyMessage(Channel channel, SocketAddress remoteAddress, Object msg) {

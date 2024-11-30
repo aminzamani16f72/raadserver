@@ -81,6 +81,7 @@ public class ConnectionManager implements BroadcastInterface {
     private final Map<Long, Set<Long>> userDevices = new HashMap<>();
     private final Map<Long, Set<Long>> deviceUsers = new HashMap<>();
 
+
     private final Map<Long, Timeout> timeouts = new ConcurrentHashMap<>();
 
     @Inject
@@ -186,7 +187,7 @@ public class ConnectionManager implements BroadcastInterface {
         }
     }
 
-    public void deviceDisconnected(Channel channel, boolean supportsOffline) {
+    public void deviceDisconnected(Channel channel, boolean supportsOffline) throws StorageException {
         SocketAddress remoteAddress = channel.remoteAddress();
         Map<String, DeviceSession> endpointSessions = sessionsByEndpoint.remove(remoteAddress);
         if (endpointSessions != null) {
@@ -201,7 +202,7 @@ public class ConnectionManager implements BroadcastInterface {
         unknownByEndpoint.remove(remoteAddress);
     }
 
-    public void deviceUnknown(long deviceId) {
+    public void deviceUnknown(long deviceId) throws StorageException {
         updateDevice(deviceId, Device.STATUS_UNKNOWN, null);
         removeDeviceSession(deviceId);
     }
@@ -217,7 +218,7 @@ public class ConnectionManager implements BroadcastInterface {
         }
     }
 
-    public void updateDevice(long deviceId, String status, Date time) {
+    public void updateDevice(long deviceId, String status, Date time) throws StorageException {
         Device device = cacheManager.getObject(Device.class, deviceId);
         if (device == null) {
             try {
@@ -237,18 +238,31 @@ public class ConnectionManager implements BroadcastInterface {
         if (!status.equals(oldStatus)) {
             String eventType;
             Map<Event, Position> events = new HashMap<>();
+            Map<String,Object> attribute=new HashMap<>();
+            String message;
             switch (status) {
                 case Device.STATUS_ONLINE:
-                    eventType = Event.TYPE_DEVICE_ONLINE;
+                    Event deviceOnline=new Event(Event.TYPE_DEVICE_ONLINE,deviceId);
+                    message=" دستگاه "+" "+device.getName()+" " + " آنلاین است.";
+                    attribute.put("messageFa",message);
+                    deviceOnline.setAttributes(attribute);
+                    events.put(deviceOnline,null);
                     break;
                 case Device.STATUS_UNKNOWN:
-                    eventType = Event.TYPE_DEVICE_UNKNOWN;
+                    Event deviceUnknown=new Event(Event.TYPE_DEVICE_ONLINE,deviceId);
+                    message=" دستگاه "+" "+device.getName()+" " + "قابل شناسایی  نیست.";
+                    attribute.put("messageFa",message);
+                    deviceUnknown.setAttributes(attribute);
+                    events.put(deviceUnknown,null);
                     break;
                 default:
-                    eventType = Event.TYPE_DEVICE_OFFLINE;
+                    Event deviceOffline=new Event(Event.TYPE_DEVICE_ONLINE,deviceId);
+                    message=" دستگاه "+" "+device.getName()+" " + " آفلاین  است.";
+                    attribute.put("messageFa",message);
+                    deviceOffline.setAttributes(attribute);
+                    events.put(deviceOffline,null);
                     break;
             }
-            events.put(new Event(eventType, deviceId), null);
             notificationManager.updateEvents(events);
         }
 
@@ -289,7 +303,7 @@ public class ConnectionManager implements BroadcastInterface {
     }
 
     @Override
-    public synchronized void updateDevice(boolean local, Device device) {
+    public synchronized void updateDevice(boolean local, Device device) throws StorageException {
         if (local) {
             broadcastService.updateDevice(true, device);
         } else if (Device.STATUS_ONLINE.equals(device.getStatus())) {
@@ -299,6 +313,7 @@ public class ConnectionManager implements BroadcastInterface {
         for (long userId : deviceUsers.getOrDefault(device.getId(), Collections.emptySet())) {
             if (listeners.containsKey(userId)) {
                 for (UpdateListener listener : listeners.get(userId)) {
+                    storage.getPermissions(User.class,userId,Device.class,device.getId());
                     listener.onUpdateDevice(device);
                 }
             }
@@ -379,7 +394,7 @@ public class ConnectionManager implements BroadcastInterface {
             listeners.put(userId, set);
 
             var devices = storage.getObjects(Device.class, new Request(
-                    new Columns.Include("id"),null, null));
+                    new Columns.Include("id"), new Condition.Permission(User.class, userId, Device.class)));
             userDevices.put(userId, devices.stream().map(BaseModel::getId).collect(Collectors.toSet()));
             devices.forEach(device -> deviceUsers.computeIfAbsent(device.getId(), id -> new HashSet<>()).add(userId));
         }

@@ -159,7 +159,7 @@ public class MainEventHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void channelInactive(ChannelHandlerContext ctx) {
+    public void channelInactive(ChannelHandlerContext ctx) throws StorageException {
         LOGGER.info("[{}] disconnected", NetworkUtil.session(ctx.channel()));
         closeChannel(ctx.channel());
 

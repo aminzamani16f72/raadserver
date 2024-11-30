@@ -104,6 +104,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.github.mfathi91/persian-date-time
     implementation group: 'com.github.mfathi91', name: 'persian-date-time', version: '4.2.1'
 
+    // https://mvnrepository.com/artifact/org.glassfish.jersey.media/jersey-media-multipart
+    implementation group: 'org.glassfish.jersey.media', name: 'jersey-media-multipart', version: '3.1.9'
+
+
 
 
 
